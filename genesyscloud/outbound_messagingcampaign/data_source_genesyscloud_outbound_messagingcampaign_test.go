@@ -1,4 +1,4 @@
-package outbound
+package outbound_messagingcampaign
 
 import (
 	"fmt"
@@ -102,6 +102,14 @@ func TestAccDataSourceOutboundMessagingCampaign(t *testing.T) {
 		}
 	}()
 
+	// Rule Set
+	testRuleSetId, err := GetOutboundDigitalRuleSets()
+
+	if err != nil || testRuleSetId == "" {
+		testRuleSetId = "cb0f5633-53db-4e52-933e-0538f15a08bc"
+		t.Log("Error retrieving Rule Set Id")
+	}
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:          func() { util.TestAccPreCheck(t) },
 		ProviderFactories: provider.GetProviderFactories(providerResources, providerDataSources),
@@ -114,12 +122,13 @@ func TestAccDataSourceOutboundMessagingCampaign(t *testing.T) {
 						resourceId,
 						digitalCampaignName,
 						"genesyscloud_outbound_contact_list."+contactListResourceId+".id",
-						"",
+						"off",
 						"10",
 						util.FalseValue,
 						"genesyscloud_outbound_callabletimeset."+callableTimeSetResourceId+".id",
 						[]string{},
 						[]string{"genesyscloud_outbound_contactlistfilter." + clfResourceId + ".id"},
+						[]string{strconv.Quote(testRuleSetId)},
 						generateOutboundMessagingCampaignSmsConfig(
 							column1,
 							column1,
@@ -135,6 +144,7 @@ func TestAccDataSourceOutboundMessagingCampaign(t *testing.T) {
 							"DESC",
 							TrueValue,
 						),
+						generateDynamicContactQueueingSettingsBlock(util.FalseValue),
 					) + generateOutboundMessagingCampaignDataSource(
 					dataSourceId,
 					digitalCampaignName,
