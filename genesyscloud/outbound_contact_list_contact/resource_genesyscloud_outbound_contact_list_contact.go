@@ -33,7 +33,7 @@ func getAllContacts(ctx context.Context, clientConfig *platformclientv2.Configur
 
 	for _, contact := range contacts {
 		//id := createCustomContactId(*contact.ContactListId, *contact.Id)
-		resources[*contact.Id] = &resourceExporter.ResourceMeta{Name: *contact.Id}
+		resources[*contact.Id] = &resourceExporter.ResourceMeta{ObjectName: *util.EmptyIfNilStringPointer(contact.Name), BlockLabel: *contact.Id}
 	}
 
 	return resources, nil
